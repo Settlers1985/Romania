@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romania 2026 Sightseeing Itinerary</title>
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #d69e2e;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --text-light: #718096;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2a4365 100%);
+            color: white;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            margin: 0.5rem 0 0 0;
+            font-size: 1.1rem;
+            color: #cbd5e0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media(min-width: 992px) {
+            .container {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        #map-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            padding: 1rem;
+            position: sticky;
+            top: 2rem;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #map {
+            flex-grow: 1;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .map-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .day-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            border-left: 5px solid var(--secondary-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .day-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .day-number {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .day-date {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .day-location {
+            font-size: 0.95rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .activity-section {
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .activity-section i {
+            color: var(--primary-color);
+            margin-top: 0.25rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .activity-text strong {
+            color: var(--primary-color);
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .activity-text p {
+            margin: 0.1rem 0 0 0;
+            font-size: 0.95rem;
+        }
+
+        .card-footer {
+            margin-top: 1rem;
+            background: #f7fafc;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .cost-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #2f855a;
+            font-weight: 600;
+        }
+
+        .transport-info {
+            color: var(--text-light);
+        }
+
+        .details-list {
+            margin: 0.25rem 0 0 0;
+            padding-left: 1.25rem;
+            color: var(--text-light);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fa-solid fa-compass"></i> Romania Adventure 2026</h1>
+        <p>A Beautiful 7-Day Sightseeing Itinerary</p>
+    </header>
+
+    <div class="container">
+        <!-- Left Side: Itinerary Cards -->
+        <div class="timeline" id="timeline">
+            <!-- Cards will be populated here dynamically -->
+        </div>
+
+        <!-- Right Side: Interactive Map -->
+        <div id="map-container">
+            <div class="map-title">
+                <i class="fa-solid fa-map-location-dot"></i> Interactive Route Map
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Romania 2026 Travel Plan • Built with &hearts; and Fancy Graphics</p>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Itinerary Data
+        const itineraryData = [{"date": "Sat, Aug 15", "day": "Day 1", "location": "Bucharest", "morning": "Arrive ~17:00 (5pm), transfer to hotel", "afternoon": "Check in + quick dinner in area", "evening": "Short walk in Old Town (Lipscani) - light exploration", "cost": "\u20ac10\u201315", "transport": "Airport\u2192center: 20\u201330 min taxi (\u20ac15\u201320 total). Light evening walk only.", "overnight": "Bucharest", "details": ["- Airport taxi: \u20ac3\u20134/person"]}, {"date": "Sun, Aug 16", "day": "Day 2", "location": "Bucharest", "morning": "Village Museum + Herastrau Park", "afternoon": "Palace of Parliament tour (inside) + Revolution Square", "evening": "CEC Palace + Stavropoleos Monastery + Old Town dinner", "cost": "\u20ac30\u201340", "transport": "Taxi to Museum: 15 min (~\u20ac10 total). Palace tour: 1 hr. Walking.", "overnight": "Bucharest", "details": ["- Village Museum: \u20ac4\u20135", "- Palace of Parliament: \u20ac10\u201312"]}, {"date": "Mon, Aug 17", "day": "Day 3", "location": "Brasov", "morning": "Train to Brasov (07:00\u201309:30) + check in + Black Church", "afternoon": "Bran Castle (bus/taxi 13:00\u201316:00) + Council Square", "evening": "Local dinner + evening walk", "cost": "\u20ac45\u201355", "transport": "Train: 2.5 hr ONE WAY, \u20ac8\u201310 rail+1. Bus to Bran: 45 min, \u20ac6\u20138. Bran visit: 2\u20132.5 hr.", "overnight": "Brasov", "details": ["- Train Bucharest\u2013Brasov: \u20ac8\u201310", "- Bus to Bran: \u20ac6\u20138", "- Bran Castle entry: \u20ac15\u201318", "- Hotel (1 night): \u20ac25\u201335"]}, {"date": "Tue, Aug 18", "day": "Day 4", "location": "Brasov \u2192 Bucharest", "morning": "Early train to Bucharest (09:00\u201311:30) + colleague airport by 14:00", "afternoon": "Free time / lunch / shopping in Bucharest", "evening": "Dinner in Old Town + relax", "cost": "\u20ac25\u201335", "transport": "Train: 2.5 hr ONE WAY, \u20ac8\u201310. Colleague: 20 min to airport. Leave Brasov by 09:00.", "overnight": "Bucharest", "details": ["- Train Brasov\u2013Bucharest: \u20ac8\u201310", "- Colleague airport (shared): \u20ac3\u20134/person"]}, {"date": "Wed, Aug 19", "day": "Day 5", "location": "Bucharest \u2192 Constanca", "morning": "CEC Palace + Stavropoleos OR free morning / shopping", "afternoon": "Train to Constanca (after 14:00) + check in", "evening": "Dinner + Casino walk", "cost": "\u20ac25\u201335", "transport": "Train: 2.5 hr ONE WAY, \u20ac10\u201312 omio. Check-in: 15 min.", "overnight": "Constanta", "details": ["- Train Bucharest\u2013Constanta: \u20ac10\u201312", "- Hotel (1 night): \u20ac25\u201335"]}, {"date": "Thu, Aug 20", "day": "Day 6", "location": "Constanta", "morning": "Roman Mosaic + Navy Museum + waterfront", "afternoon": "Aquarium + beach (2\u20133 hr) + swim", "evening": "Dinner + Black Sea walk", "cost": "\u20ac15\u201320", "transport": "Walking. Museums: 1\u20131.5 hrs. Beach: 15 min rriyoutube", "overnight": "Constanta", "details": ["- Roman Mosaic: \u20ac4\u20135", "- Navy Museum: \u20ac5\u20136", "- Aquarium: \u20ac8\u201310", "- Beach: free"]}, {"date": "Fri, Aug 21", "day": "Day 7", "location": "Bucharest", "morning": "Check out + Train to Bucharest", "afternoon": "Peles Castle (Sinaia) organized tour", "evening": "Return + farewell dinner", "cost": "\u20ac55\u201370", "transport": "Train: 2.5 hr ONE WAY, \u20ac10\u201312. Tour: 6\u20137 hr viator", "overnight": "Bucharest", "details": ["- Train Constanta\u2013Bucharest: \u20ac10\u201312", "- Peles tour (incl. transport + entry): \u20ac45\u201360"]}];
+
+        // Coordinates Mapping
+        const locationsCoords = {
+            "Bucharest": [44.4323, 26.1063],
+            "Brasov": [45.6427, 25.5887],
+            "Bran": [45.5149, 25.3672],
+            "Constanta": [44.1792, 28.6498],
+            "Sinaia": [45.3539, 25.5426]
+        };
+
+        // Render Cards
+        const timeline = document.getElementById('timeline');
+        itineraryData.forEach((day, index) => {
+            let detailsHtml = day.details.map(d => `<li>${d}</li>`).join('');
+            let card = document.createElement('div');
+            card.className = 'day-card';
+            card.setAttribute('onclick', `focusDay(${index})`);
+            card.innerHTML = `
+                <div class="day-header">
+                    <div class="day-title">
+                        <span class="day-number">${day.day}</span>
+                        <span class="day-date">${day.date}</span>
+                    </div>
+                    <div class="day-location">
+                        <i class="fa-solid fa-location-dot"></i> ${day.location}
+                    </div>
+                </div>
+                <div class="activity-section">
+                    <i class="fa-solid fa-cloud-sun"></i>
+                    <div class="activity-text">
+                        <strong>Morning</strong>
+                        <p>${day.morning}</p>
+                    </div>
+                </div>
+                <div class="activity-section">
+                    <i class="fa-solid fa-sun"></i>
+                    <div class="activity-text">
+                        <strong>Afternoon</strong>
+                        <p>${day.afternoon}</p>
+                    </div>
+                </div>
+                <div class="activity-section">
+                    <i class="fa-solid fa-moon"></i>
+                    <div class="activity-text">
+                        <strong>Evening</strong>
+                        <p>${day.evening}</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+                        <span class="cost-badge"><i class="fa-solid fa-wallet"></i> Est: ${day.cost}</span>
+                        <span style="color:var(--text-light)"><i class="fa-solid fa-bed"></i> Overnight: <strong>${day.overnight}</strong></span>
+                    </div>
+                    <div class="transport-info">
+                        <i class="fa-solid fa-train"></i> ${day.transport}
+                    </div>
+                    ${detailsHtml ? `<ul class="details-list">${detailsHtml}</ul>` : ''}
+                </div>
+            `;
+            timeline.appendChild(card);
+        });
+
+        // Initialize Map
+        const map = L.map('map').setView([45.0, 26.5], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add Markers
+        const markers = {};
+        Object.keys(locationsCoords).forEach(loc => {
+            let marker = L.marker(locationsCoords[loc])
+                .addTo(map)
+                .bindPopup(`<b>${loc}</b><br>Featured in the itinerary!`);
+            markers[loc] = marker;
+        });
+
+        // Draw Route Lines
+        const routePoints = [
+            locationsCoords["Bucharest"],
+            locationsCoords["Sinaia"],
+            locationsCoords["Brasov"],
+            locationsCoords["Bran"],
+            locationsCoords["Brasov"],
+            locationsCoords["Bucharest"],
+            locationsCoords["Constanta"],
+            locationsCoords["Bucharest"]
+        ];
+
+        const polyline = L.polyline(routePoints, {
+            color: '#d69e2e',
+            weight: 4,
+            opacity: 0.7,
+            dashArray: '10, 10'
+        }).addTo(map);
+
+        // Focus day function
+        window.focusDay = function(index) {
+            const day = itineraryData[index];
+            let locKey = "Bucharest";
+            if (day.location.includes("Brasov")) locKey = "Brasov";
+            else if (day.location.includes("Constanca") || day.location.includes("Constanta")) locKey = "Constanta";
+            else if (day.afternoon.includes("Bran")) locKey = "Bran";
+            else if (day.afternoon.includes("Peles") || day.afternoon.includes("Sinaia")) locKey = "Sinaia";
+            
+            if (locationsCoords[locKey]) {
+                map.setView(locationsCoords[locKey], 9, { animate: true, duration: 1 });
+                markers[locKey].openPopup();
+            }
+        };
+    </script>
+</body>
+</html>
